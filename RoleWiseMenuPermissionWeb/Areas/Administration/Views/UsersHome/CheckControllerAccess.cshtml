@@ -1,0 +1,62 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row pb-3">
+    <div class="col-6">
+        <h4>Check Controller To Controller Access</h4>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row mb-3">
+        <label class="col-md-2 col-form-label">Controller Name</label>
+        <div class="col-md-6">
+            @Html.DropDownList("Controller", ViewBag.ControllerNameList as SelectList, "--select--", new { @class = "form-select" })
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label class="col-md-2 col-form-label">Action Name</label>
+        <div class="col-md-6">
+            @Html.DropDownList("MenuName", ViewBag.MenuList as SelectList, "--select--", new { @class = "form-select" })
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(document).on('change', '#Controller', function (e) {
+                var ControllerId = $(this).val();
+                if (ControllerId) {
+                    let url = '@Url.Action("LoadMenuName", "CommonAjax")';
+                    let data = { controllerId: ControllerId };
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        cache: false,
+                        async: true,
+                        data: data,
+                        success: function (response) {
+                            console.log(response)
+                            if (response.isSuccess) {
+                                var actionSelect = $('#MenuName');
+                                actionSelect.html('');
+                                $.each(response.returnMenuList, function (i, v) {
+                                    actionSelect.append($('<option>', {
+                                        value: v.value,
+                                        text: v.text
+                                    }));
+                                });
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
