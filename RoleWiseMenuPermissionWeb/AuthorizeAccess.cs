@@ -35,7 +35,34 @@ namespace RoleWiseMenuPermissionWeb
             var hasAuthorizeC = controllerType.GetCustomAttributes(typeof(AuthorizeAttribute), true).Any();
             string authorizeKeyword = hasAuthorizeC ? "Authorize" : "";
 
-            if (currentUser != null && currentUser.Identity != null && currentUser.Identity.IsAuthenticated && name != null && userRoles.Value != "SuperAdmin")
+            if(currentUser != null && currentUser.Identity != null && currentUser.Identity.IsAuthenticated && name != null && userRoles == null)
+            {
+                var menuList = _dataAccessService.GetMenusByUserName(name);
+                var isAllowedMenu = menuList.Where(x => x.ControllerName == controllerName && x.ActionName == actionName).Any();
+
+                if (!isAllowedMenu && authorizeKeyword != "" && authorizeAttributeName == null && isAjaxRequest == false)
+                {
+                    RedirectToPermissionDenied(filterContext);
+                }
+
+                var menuDictionary = new Dictionary<string, List<MenuAccessViewModel>>();
+
+                if (menuList != null)
+                {
+                    foreach (var menu in menuList)
+                    {
+                        if (!menuDictionary.ContainsKey(menu.ParentName))
+                        {
+                            menuDictionary[menu.ParentName] = new List<MenuAccessViewModel>();
+                        }
+
+                        menuDictionary[menu.ParentName].Add(menu);
+                    }
+                }
+                filterContext.HttpContext.Items["MenuList"] = menuDictionary;
+            }
+
+            else if (currentUser != null && currentUser.Identity != null && currentUser.Identity.IsAuthenticated && name != null && userRoles.Value != "SuperAdmin")
             {
                 var menuList = _dataAccessService.GetMenusByUserName(name);
                 var isAllowedMenu = menuList.Where(x=>x.ControllerName == controllerName && x.ActionName == actionName).Any();

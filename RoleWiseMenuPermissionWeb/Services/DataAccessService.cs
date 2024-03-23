@@ -425,7 +425,7 @@ LEFT JOIN MenuGroups AS mg ON mg.Id = cmg.MenuGroupId
         public List<MenuAccessViewModel> GetMenusByUserName(string name)
         {
             var sql = @"
-SELECT DISTINCT
+SELECT 
 m.Id,
 m.DisplayName,
 a.ActionName,
@@ -433,14 +433,15 @@ cmg.ControllerName,
 mg.AreaName,
 m.ParentsId,
 ap.DisplayName as ParentName
-FROM RoleMenuPermissions AS rmp
+FROM AspNetUsers as u
+LEFT JOIN AspNetUserRoles AS ur ON ur.UserId = u.Id
+LEFT JOIN RoleMenuPermissions AS rmp ON rmp.RoleId = ur.RoleId
 LEFT JOIN Menus AS m ON rmp.MenuWisePermissionId = m.Id 
 LEFT JOIN Actions AS a ON m.ActionId = a.Id
 LEFT JOIN Menus AS ap ON ap.Id = m.ParentsId
 LEFT JOIN ControllerMenuGroups AS cmg ON cmg.Id = a.ControllerMenuGroupId
 LEFT JOIN MenuGroups AS mg ON mg.Id = cmg.MenuGroupId
-LEFT JOIN AspNetUsers AS u ON u.UserName = 'tusher@gmail.com'
-LEFT JOIN AspNetUserRoles AS ur ON ur.UserId = u.Id
+WHERE u.Email = @UserName AND rmp.MenuWisePermissionId IS NOT NULL
 ";
             var result = LoadPermissionedMenusByDapper(sql, new { UserName = name });
             return result;
