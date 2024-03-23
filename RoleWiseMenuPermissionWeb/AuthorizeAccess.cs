@@ -39,6 +39,7 @@ namespace RoleWiseMenuPermissionWeb
             {
                 var menuList = _dataAccessService.GetMenusByUserName(name);
                 var isAllowedMenu = menuList.Where(x => x.ControllerName == controllerName && x.ActionName == actionName).Any();
+                //var httpRequest = filterContext.HttpContext.Request;
 
                 if (!isAllowedMenu && authorizeKeyword != "" && authorizeAttributeName == null && isAjaxRequest == false)
                 {
@@ -67,7 +68,7 @@ namespace RoleWiseMenuPermissionWeb
                 var menuList = _dataAccessService.GetMenusByUserName(name);
                 var isAllowedMenu = menuList.Where(x=>x.ControllerName == controllerName && x.ActionName == actionName).Any();
 
-                if (!isAllowedMenu && authorizeKeyword != "" && authorizeAttributeName == null && isAjaxRequest == false)
+                if (!isAllowedMenu && authorizeKeyword != "" && authorizeAttributeName == null && isAjaxRequest == false )
                 {
                     RedirectToPermissionDenied(filterContext);
                 }
@@ -78,12 +79,15 @@ namespace RoleWiseMenuPermissionWeb
                 {
                     foreach ( var menu in menuList )
                     {
-                        if (!menuDictionary.ContainsKey(menu.ParentName))
+                        if (!menu.ActionName.StartsWith("Edit", StringComparison.OrdinalIgnoreCase) && !menu.ActionName.StartsWith("Update", StringComparison.OrdinalIgnoreCase))
                         {
-                            menuDictionary[menu.ParentName] = new List<MenuAccessViewModel>();
-                        }
+                            if (!menuDictionary.ContainsKey(menu.ParentName))
+                            {
+                                menuDictionary[menu.ParentName] = new List<MenuAccessViewModel>();
+                            }
 
-                        menuDictionary[menu.ParentName].Add(menu);
+                            menuDictionary[menu.ParentName].Add(menu);
+                        }                      
                     }
                 }
                 filterContext.HttpContext.Items["MenuList"] = menuDictionary;
@@ -97,12 +101,15 @@ namespace RoleWiseMenuPermissionWeb
                 {
                     foreach (var menu in menuList)
                     {
-                        if (!menuDictionary.ContainsKey(menu.ParentName))
+                        if (!menu.ActionName.StartsWith("Edit", StringComparison.OrdinalIgnoreCase) && !menu.ActionName.StartsWith("Update", StringComparison.OrdinalIgnoreCase))
                         {
-                            menuDictionary[menu.ParentName] = new List<MenuAccessViewModel>();
-                        }
+                            if (!menuDictionary.ContainsKey(menu.ParentName))
+                            {
+                                menuDictionary[menu.ParentName] = new List<MenuAccessViewModel>();
+                            }
 
-                        menuDictionary[menu.ParentName].Add(menu);
+                            menuDictionary[menu.ParentName].Add(menu);
+                        }
                     }
                 }
                 filterContext.HttpContext.Items["MenuList"] = menuDictionary;

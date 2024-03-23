@@ -1,13 +1,13 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="row pb-3">
+<div class="row pb-4">
     <div class="col-6">
         <h4>Check Controller To Controller Access</h4>
     </div>
 </div>
 
-<div class="container">
+<div class="container-fluid">
     <div class="row mb-3">
         <label class="col-md-2 col-form-label">Controller Name</label>
         <div class="col-md-6">
@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="row mb-3">
-        <label class="col-md-2 col-form-label">Action Name</label>
+        <label class="col-md-2 col-form-label">Menu Name</label>
         <div class="col-md-6">
             @Html.DropDownList("MenuName", ViewBag.MenuList as SelectList, "--select--", new { @class = "form-select" })
         </div>

@@ -317,8 +317,10 @@ namespace RoleWiseMenuPermissionWeb.Services
                     if (authorizeAttribute != null)
                     {
                         var methods = controller.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                        var nonHttpPostMethods = methods.Where(method => !method.IsDefined(typeof(HttpPostAttribute), inherit: true));
                         var AreaController = _context.ControllerMenuGroups.Where(x => x.ControllerName == controllerName).FirstOrDefault();
-                        foreach (var method in methods)
+
+                        foreach (var method in nonHttpPostMethods)
                         {
                             var attributes = method.GetCustomAttributes(true);
                             var allowAnonymousAttribute = attributes.FirstOrDefault(attr => attr.GetType() == typeof(AllowAnonymousAttribute)) as AllowAnonymousAttribute;
@@ -347,8 +349,6 @@ namespace RoleWiseMenuPermissionWeb.Services
 
                                 }
                             }
-
-
                         }
                     }
                 }
